@@ -2,8 +2,8 @@
 Some utils func and exemple written in nasm 
 
 Utils:
-  -  Malloc and free ()
-  -  printf (work in progress)
+  -  Malloc and free (work in progress)
+  -  printf 
     
 Exemples:
   -  Hello_world
