@@ -8,5 +8,5 @@ Utils:
 Exemples:
   -  Hello_world
   -  Triangles
-  -  TCP server
-  -  TCP client 
+  -  TCP server (on port 4444)
+  -  TCP client  (on port 4444)
