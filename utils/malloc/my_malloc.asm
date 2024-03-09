@@ -296,6 +296,68 @@ close_malloc:
 ;																			   ;
 ;							#####################							   ;
 ;							#					#							   ;
+;							#	   memcpy		#							   ;
+;							#					#							   ;
+;							#####################							   ;
+;																			   ;
+;	args:																	   ;
+;		rdi	-> ptr src														   ;
+;		rsi	-> ptr dst														   ;
+;		rdx	-> nb bytes														   ;
+;------------------------------------------------------------------------------;
+memcpy:
+			push	rdi
+			push	rsi
+			push	rdx
+			push	rax
+.L1:
+			cmp		rdx, 0
+			je		.done
+			mov		al, BYTE [rdi]
+			mov		BYTE [rsi], al
+			inc		rdi
+			inc		rsi
+			dec		rdx
+			jmp		.L1
+.done:
+			pop		rax
+			pop		rdx
+			pop		rsi
+			pop		rdi
+			ret
+
+;------------------------------------------------------------------------------;
+;																			   ;
+;							#####################							   ;
+;							#					#							   ;
+;							#	  my_calloc		#							   ;
+;							#					#							   ;
+;							#####################							   ;
+;																			   ;
+;	args:																	   ;
+;		rdi	-> nb of bytes													   ;
+;------------------------------------------------------------------------------;
+my_calloc:
+			call	my_malloc
+			push	rdi
+			push	rax
+.L1:
+			cmp		rdi, 0
+			je		.done
+			mov		BYTE [rax], 0
+			inc		rax
+			dec		rdi
+			jmp		.L1
+.done:
+			pop		rax
+			pop		rdi
+			ret
+
+
+;------------------------------------------------------------------------------;
+;																			   ;
+;							#####################							   ;
+;							#					#							   ;
 ;							#	debug_block		#							   ;
 ;							#					#							   ;
 ;							#####################							   ;
