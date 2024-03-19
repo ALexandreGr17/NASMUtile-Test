@@ -1,8 +1,8 @@
 ASM=nasm
 AFLAGS=-felf64 -gdwarf
-SRC=main.asm astdio.asm utils.asm
+SRC=main.asm strings.asm
 OBJ=$(SRC:.asm=.o)
-EXE=astdio
+EXE=strings
 
 
 all: $(OBJ)

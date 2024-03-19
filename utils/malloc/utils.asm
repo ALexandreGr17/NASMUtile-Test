@@ -118,4 +118,71 @@ printError:
 	
 			ret
 
+;------------------------------------------------------------------------------;
+;																			   ;
+;							#####################							   ;
+;							#					#							   ;
+;							#	   atoi 		#							   ;
+;							#					#							   ;
+;							#####################							   ;
+;																			   ;
+;	args:																	   ;
+;			rdi -> str to convert	 										   ;
+;	return:																	   ;
+;			rax -> int     											           ;
+;------------------------------------------------------------------------------;
+
+atoi:
+		push	rdi
+		push	rbx
+		xor		rax, rax
+.L1:
+		cmp		byte [rdi], 0x00
+		je		.done
+		imul	rax, 0x0a
+		mov		bl, byte [rdi]
+		sub		bl, '0'
+		add     rax, rbx
+		inc		rdi
+		jmp		.L1
+.done:
+		pop		rbx
+		pop		rdi
+		ret
+
+;------------------------------------------------------------------------------;
+;																			   ;
+;							#####################							   ;
+;							#					#							   ;
+;							#	   memcpy		#							   ;
+;							#					#							   ;
+;							#####################							   ;
+;																			   ;
+;	args:																	   ;
+;		rdi	-> ptr src														   ;
+;		rsi	-> ptr dst														   ;
+;		rdx	-> nb bytes														   ;
+;------------------------------------------------------------------------------;
+
+memcpy:
+			push	rdi
+			push	rsi
+			push	rdx
+			push	rax
+.L1:
+			cmp		rdx, 0
+			je		.done
+			mov		al, BYTE [rdi]
+			mov		BYTE [rsi], al
+			inc		rdi
+			inc		rsi
+			dec		rdx
+			jmp		.L1
+.done:
+			pop		rax
+			pop		rdx
+			pop		rsi
+			pop		rdi
+			ret
+
 

@@ -1,3 +1,4 @@
+DEFAULT REL
 global	exit
 global	strlen
 global	printError
