@@ -12,6 +12,7 @@ extern	accept
 extern	close
 extern	send
 extern	recv
+extern	fork
 ; #############################################################################
 section .text
 
@@ -55,6 +56,11 @@ _start:
 		jl		.accept_error
 
 		mov		r8, rax
+		call	fork
+		cmp		rax, 0
+		jl		.fork_error
+		jg		.L1
+
 
 		mov		rdi, new_client
 		call	printString
@@ -75,6 +81,9 @@ _start:
 
 		mov		rdi, r8
 		call	close
+
+		mov		rdi, close_connection
+		call	printString
 
 		mov		rsp, rbp
 		pop		rbp
@@ -106,6 +115,10 @@ _start:
 		mov		rdi, recv_error_msg
 		jmp		.error
 
+.fork_error:
+		mov		rdi, fork_error_msg
+		jmp		.error
+
 .error:
 		call	printError
 		
@@ -120,13 +133,14 @@ _start:
 section .data
 hello_world:		db	"[SERVER] Server Started on Port 4444", 0xa , 0x00
 new_client:			db	"[SERVER] new client", 0x0a, 0x00
+close_connection:	db	"[SERVER] Close socket", 0x0a, 0x0
 socket_error_msg:	db	"Error on Socket Creation", 0xa, 0x00
 bind_error_msg:		db  "Error on Bind", 0x0a, 0x00
 listen_error_msg:	db  "Error on listen", 0xa, 0x00
 accept_error_msg:	db	"Error on accept", 0xa, 0x00
 close_error_msg:	db	"Error on close", 0xa, 0x00
 recv_error_msg:		db	"Error on recv", 0x0a, 0x00
-
+fork_error_msg:		db	"Error on fork", 0x0a, 0x0
 client_hello:		db	"Hello world", 0xa, 0x00
 
 section	.bss

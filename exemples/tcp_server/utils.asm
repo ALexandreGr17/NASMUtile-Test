@@ -12,6 +12,7 @@ global	close
 global	send
 global	recv
 global	strcopy
+global	fork
 
 ; ################################ define ######################################
 
@@ -22,6 +23,7 @@ global	strcopy
 %define EXIT			0x3C
 %define CLOSE			0x03
 %define READ			0x00
+%define FORK			0x39
 
 ;	---- SOCKET ----
 %define SOCKET			0x29
@@ -418,4 +420,23 @@ strcopy:
 		mov		rax, r8
 		pop		rsi
 		pop		rdi
+		ret
+
+;------------------------------------------------------------------------------;
+;																			   ;
+;							#####################							   ;
+;							#					#							   ;
+;							#		fork		#							   ;
+;							#					#							   ;
+;							#####################							   ;
+;																			   ;
+;	return:																	   ;
+;			rax -> PID -> 0 Child											   ;
+;					   -> < 0 Error											   ;
+;					   -< > 0 Parrent										   ;
+;------------------------------------------------------------------------------;
+
+fork:
+		mov		rax, FORK
+		syscall
 		ret
