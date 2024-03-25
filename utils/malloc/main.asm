@@ -17,14 +17,15 @@ _start:
 		;call	printString
 		call	init_malloc
 
-		mov		rdi, 0xa
+		mov		rdi, 0x10
 		call	my_calloc
 		mov		QWORD [rax], rax
 		mov		rsi, rax
 		call	my_malloc
 		
-		mov		rdi, rsi
-		call	my_free
+
+		mov		rdi, 0x10
+		call	my_malloc
 
         call    close_malloc
 		xor		rdi, rdi
