@@ -2,6 +2,7 @@ global	strlen
 global	strcmp
 global	strcopy
 global	strconcat
+global	strsplit
 
 %define TRUE 1
 %define FALSE 0
@@ -148,5 +149,39 @@ strconcat:
 	pop		rax
 	pop		rdx
 	pop		rsi
+	pop		rdi
+	ret
+
+;------------------------------------------------------------------------------;
+;																			   ;
+;							#####################							   ;
+;							#					#							   ;
+;							#	  strsplit		#							   ;
+;							#					#							   ;
+;							#####################							   ;
+;																			   ;
+;	args:																	   ;
+;			rdi -> ptr to string											   ;
+;			sil	-> char to split on											   ;
+;	reutrn:																	   ;
+;			rax -> nb of chunk splited										   ;
+;------------------------------------------------------------------------------;
+
+strsplit:
+	push	rdi
+	mov		rax, 1
+.L1:
+	cmp		BYTE [rdi], 0
+	je		.done
+	cmp		BYTE [rdi], sil
+	je		.spliting
+.conitnue:
+	inc		rdi
+	jmp		.L1
+.spliting:
+	mov		BYTE [rdi], 0
+	inc		rax
+	jmp		.conitnue
+.done:
 	pop		rdi
 	ret
