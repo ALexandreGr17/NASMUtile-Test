@@ -377,5 +377,39 @@ debug_block:
             mov     rcx, QWORD [rdi + BLOCK_FREED]
             ret
 
+;------------------------------------------------------------------------------;
+;																			   ;
+;							#####################							   ;
+;							#					#							   ;
+;							#	 my_realloc		#							   ;
+;							#					#							   ;
+;							#####################							   ;
+;																			   ;
+;	args:																	   ;
+;		rdi	-> nb of byte													   ;
+;		rsi -> ptr to old mem address										   ;
+;	return:																	   ;
+;		rax	-> new mem address												   ;
+;------------------------------------------------------------------------------;
+
+my_realloc:
+	push	rdi
+	push	rsi
+
+	call	my_malloc
+	mov		rdi, rax
+	sub		rsi, SIZE_BLOCK_STRUCT
+	mov		rdx, QWORD [rsi + BLOCK_DATA_SIZE]
+	add		rsi, SIZE_BLOCK_STRUCT
+	xor		rdi, rsi
+	xor		rsi, rdi
+	xor		rdi, rsi
+	call	memcpy
+	
+	mov		rax, rsi
+	pop		rsi
+	pop		rdi
+	ret
+
 section .bss
 heap_ptr:	resq	1

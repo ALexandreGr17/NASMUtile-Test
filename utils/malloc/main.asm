@@ -9,6 +9,7 @@ extern  debug_block
 extern	init_malloc
 extern	close_malloc
 extern	my_calloc
+extern	my_realloc
 ; ##############################################################################
 
 section .text
@@ -18,14 +19,12 @@ _start:
 		call	init_malloc
 
 		mov		rdi, 0x10
-		call	my_calloc
-		mov		QWORD [rax], rax
+		call	my_malloc
+		mov		QWORD [rax], 0x10
 		mov		rsi, rax
-		call	my_malloc
-		
+		mov		rdi, 0x20
+		call	my_realloc
 
-		mov		rdi, 0x10
-		call	my_malloc
 
         call    close_malloc
 		xor		rdi, rdi
