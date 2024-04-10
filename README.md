@@ -3,7 +3,10 @@ Some utils func and exemple written in nasm
 
 Utils:
   -  Malloc and free (work in progress)
-  -  printf 
+  -  printf
+  -  Heap
+  -  Strings
+  -  Queue
     
 Exemples:
   -  Hello_world
