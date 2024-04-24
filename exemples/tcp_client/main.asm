@@ -11,6 +11,7 @@ extern	socket
 extern	connect
 extern	send
 extern	recv
+extern	read_stdin
 ; ##############################################################################
 
 section	.text
@@ -43,11 +44,16 @@ _start:
 		mov		rdi, rsi
 		call	printString
 
+		mov		rdi, buffer_input
+		call	read_stdin
+		mov		BYTE [rdi + rax], 0
+		call	printString
+
 		mov		rdi, r8
 
-		mov		rsi, hello
+		mov		rsi, buffer_input
 		call	send
-
+		
 		mov		rsp, rbp
 		pop		rbp
 		xor		rdi, rdi
@@ -59,3 +65,4 @@ hello:		db		"hello world", 0xa, 0x0
 
 section	.bss
 buffer:		resb	4096
+buffer_input: resb	4096

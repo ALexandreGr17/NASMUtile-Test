@@ -1,6 +1,6 @@
 ASM=nasm
 AFLAGS=-gdwarf -felf64
-SRC= ./hello.asm ./triangle.asm
+SRC= ./hello.asm ./triangle.asm ./execve.asm
 OBJ= $(SRC:.asm=.o)
 EXE= $(SRC:.asm=E)
 SUBDIR= ./tcp_client ./tcp_server

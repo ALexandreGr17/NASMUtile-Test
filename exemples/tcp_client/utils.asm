@@ -8,9 +8,10 @@ global	socket
 global	connect
 global	send
 global	recv
+global	read_stdin
 ; ################################ define ######################################
 %define	EXIT				0x3c
-%define WRITE				0x01
+%define STDIN				0x00
 %define STDOUT				0x01
 %define STDERR				0x02
 %define SOCKET				0x29
@@ -365,3 +366,30 @@ recv:
 		ret
 
 
+;------------------------------------------------------------------------------;
+;																			   ;
+;							#####################							   ;
+;							#					#							   ;
+;							#    read_stdin		#							   ;
+;							#					#							   ;
+;							#####################							   ;
+;																			   ;
+;	args:																	   ;
+;			rdi -> ptr to output buffer										   ;
+;	return:																	   ;
+;			rax -> size read or error code									   ;
+;------------------------------------------------------------------------------;
+
+read_stdin:
+		push	rsi
+		push	rdi
+
+		mov		rax, READ
+		mov		rsi, rdi
+		mov		rdi, STDIN
+		mov		rdx, 4096
+		syscall
+		
+		pop		rdi
+		pop		rsi
+		ret
