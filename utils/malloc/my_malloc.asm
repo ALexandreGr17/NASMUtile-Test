@@ -405,7 +405,7 @@ my_realloc:
 	xor		rsi, rdi
 	xor		rdi, rsi
 	call	memcpy
-	
+	call    my_free
 	mov		rax, rsi
 	pop		rsi
 	pop		rdi

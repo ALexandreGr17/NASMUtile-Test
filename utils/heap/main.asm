@@ -27,11 +27,6 @@ _start:
 	call	heap_push
 
 
-	call	heap_pop
-	call	heap_pop
-	call	heap_pop
-	call	heap_pop
-
 	call	heap_free
 	
 	call	close_malloc

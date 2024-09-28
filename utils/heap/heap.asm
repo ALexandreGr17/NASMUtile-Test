@@ -19,6 +19,47 @@ extern  init_malloc
 %define HEAP_SIZE			0x08
 %define HEAP_CAP			0x10
 
+
+; ############################### MACRO ########################################
+
+; put_elt:
+;   1: ptr to array
+;   2: pos
+;   3: elt
+
+%macro put_elt 3
+    push    %1
+    push    %2
+
+    shl     %2, 3
+    add     %1, %2
+    mov     QWORD [%1], %3
+
+    pop     %1
+    pop     %2
+
+%endmacro
+
+; get_elt:
+;   1: ptr to array
+;   2: pos
+;   3: return
+
+%macro get_elt 3
+    push    %1
+    push    %2
+
+    shl     %2, 3
+    add     %1, %2
+    mov     %3, QWORD [%1]
+
+    pop     %1
+    pop     %2
+
+%endmacro
+
+; ############################### FUNCTION #####################################
+
 ;------------------------------------------------------------------------------;
 ;																			   ;
 ;							#####################							   ;
@@ -42,7 +83,7 @@ heap:
 	call	my_malloc
 	pop		rdi
 	mov		QWORD [rdi + HEAP_VEC], rax
-	mov		QWORD [rdi + HEAP_SIZE], 0
+	mov		QWORD [rdi + HEAP_SIZE], 1
 	mov		QWORD [rdi + HEAP_CAP], 0x10 * 0x08
 	mov		rax, rdi
 	pop		rdi
@@ -62,6 +103,8 @@ heap:
 ;			rdx -> ptr to compare func if null normal comparaison will be use  ;
 ;------------------------------------------------------------------------------;
 
+
+
 heap_push:
 	push	rax
 	push	rdi
@@ -70,54 +113,56 @@ heap_push:
 	push	rcx
 
 	mov		rcx, QWORD [rdi + HEAP_SIZE]
+    inc     rcx
 	cmp		rcx, QWORD [rdi + HEAP_CAP]
 	jge		.expand
 .continue:
-	mov		rax, QWORD [rdi + HEAP_SIZE]
-	mov		r8, 0x8
-	mul		r8
-	add		rax, QWORD [rdi + HEAP_VEC]
-	mov		QWORD [rax], rsi
-.L1:
-	cmp		rdx, 0
-	jne		.new_func
-	cmp		rcx, 0
-	jle		.done
-	mov		r8, QWORD [rax]
-	cmp		r8, QWORD [rax - 0x8]
-	jge		.done
-.swap:
-	mov		rdi, QWORD [rax]
-	xchg	rdi, QWORD [rax - 0x8]
-	mov		QWORD [rax], rdi
-	sub		rax, 0x8
-	dec		rcx
-	jmp		.L1
-.done:
-	pop		rcx
-	pop		r8
-	pop		rsi
-	pop		rdi
-	add		QWORD [rdi + HEAP_SIZE], 1
-	pop		rax
-	ret
-.new_func:
-	push	rax
-	mov		rdi, QWORD [rax]
-	mov		rsi, QWORD [rax - 0x8]
-	call	rdx
-	cmp		rax, -1
-	jne		.done
-	pop		rax
-	jmp		.swap
-.expand:
-	push	rdi
-	mov		rsi, QWORD [rdi + HEAP_VEC]
-	mov		rdi, QWORD [rdi + HEAP_SIZE]
-	add		rdi, rdi
-	call	my_realloc
-	jmp		.continue
+    mov     QWORD [rdi + HEAP_SIZE], rcx
+    dec     rcx
 
+    mov     rdi, QWORD [rdi + HEAP_VEC]
+
+    put_elt rdi, rcx, rsi
+
+.L1:
+    mov     r8, rcx
+    shr     r8, 1
+
+    get_elt rdi, r8, rax
+
+    cmp     rax, rsi
+    jge     .done
+
+    put_elt rdi, rcx, rax
+    put_elt rdi, r8, rsi
+
+    mov     rcx, r8
+    jmp     .L1
+
+.expand:
+    push    rdi
+    push    rsi
+
+    mov     rsi, QWORD [rdi + HEAP_VEC]
+    mov     rdi, QWORD [rdi + HEAP_CAP]
+    add     rdi, 10
+    call    my_realloc
+
+    pop     rsi
+    pop     rdi
+    mov     QWORD [rdi + HEAP_VEC], rax
+    jmp     .continue
+
+
+.done:
+
+    pop     rcx
+    pop     r8
+    pop     rsi
+    pop     rdi
+    pop     rax
+    ret
+	
 ;------------------------------------------------------------------------------;
 ;																			   ;
 ;							#####################							   ;
@@ -133,28 +178,58 @@ heap_push:
 ;------------------------------------------------------------------------------;
 
 heap_pop:
+    push    rbp
+    mov     rbp, rsp
+    sub     rsp, 8
+
 	push	rcx
 	push	rsi
 	push	rbx
 
-	mov		rsi, QWORD [rdi + HEAP_VEC]
-	mov		rax, QWORD [rsi]
-	add		rsi, 0x08
-	mov		rcx, 1
-.L1:
-	cmp		rcx, QWORD [rdi + HEAP_SIZE]
-	jge		.done
-	mov		rbx, QWORD [rsi]
-	mov		QWORD [rsi - 0x8], rbx
-	add		rsi, 0x08
-	inc		rcx
-	jmp		.L1
-.done:
-	pop		rbx
-	pop		rsi
-	pop		rcx
-	ret
+    mov     rcx, QWORD [rdi + HEAP_SIZE]
+    mov     rdi, QWORD [rdi + HEAP_VEC]
 
+    mov     rsi, 1
+
+    get_elt rdi, rsi, rax
+    mov     QWORD [rsp], rax
+
+.L1:
+    push    rsi
+
+    shl     rsi, 1
+    cmp     rsi, rcx
+    jg      .done
+
+    get_elt rdi, rsi, rax
+    inc     rsi
+    get_elt rdi, rsi, rbx
+
+    cmp     rax, rbx
+    jge     .first
+    pop     rsi
+    put_elt rdi, rsi, rbx
+    shl     rsi, 1
+    inc     rsi
+    jmp     .L1
+
+.first:
+    pop     rsi
+    put_elt rdi, rsi, rax
+    shl     rsi
+    jmp     .L1
+
+
+    
+.done:
+    mov     rax, QWORD [rsp]
+	pop     rbx
+    pop     rsi
+    pop     rcx
+
+    mov     rsp, rbp
+    pop     rbp
+    ret
 ;------------------------------------------------------------------------------;
 ;																			   ;
 ;							#####################							   ;
